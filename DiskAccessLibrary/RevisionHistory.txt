@@ -279,3 +279,19 @@ Revision History:
 1.5.9 - PhysicalDiskControl: Improved serial number decoding logic.
         Moved capabilities useful only on Windows to DiskAccessLibrary.Win32
         Detect platform instead of using platform specific compilation.
+
+1.6.0 - Added .NET Framework 4.7.2 target.
+        Improved detection of dynamic disks.
+        VMDK: Improved support for reading monolithic sparse disk.
+        VMDK: Ability to create monolithic flat disk.
+        VMDK: Ability to create monolithic sparse disk.
+        VMDK: SparseExtent: Fix excessive reading.
+        NTFS: FileRecordSegment: Add AllocatedLength property.
+        NTFS: FileRecordSegment: Mark class as public.
+        NTFS: FileRecord: Mark constructors as public.
+        NTFS: AttributeRecord: Validate that attribute record length is greater than or equal to the minimal valid length.
+        NTFS: FileRecordSegment: Validate length.
+        NTFS: FileRecordSegment: Corrected segment boundary validation.
+        NTFS: NonResidentAttributeRecord: Validate LowestVCN, HighestVCN and mappingPairsOffset.
+        NTFS: NonResidentAttributeRecord: Read TotalAllocated if record indicates compression.
+        IOExceptionHelper.ThrowIOError: Mark as public.
