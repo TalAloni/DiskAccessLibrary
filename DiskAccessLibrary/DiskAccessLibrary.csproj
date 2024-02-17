@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <Target Name="ILRepack" Condition="'$(Configuration)' == 'Publish'" AfterTargets="AfterBuild">
-    <Exec Command="&quot;$(ProgramW6432)\ILRepack\ILRepack.exe&quot; /out=&quot;$(OutputPath)\DiskAccessLibrary.dll&quot; &quot;$(OutputPath)\DiskAccessLibrary.dll&quot; &quot;$(OutputPath)\Utilities.dll&quot;"></Exec>
+    <Exec Command="&quot;$(ProgramW6432)\ILRepack\ILRepack.exe&quot; /internalize /out=&quot;$(OutputPath)\DiskAccessLibrary.dll&quot; &quot;$(OutputPath)\DiskAccessLibrary.dll&quot; &quot;$(OutputPath)\Utilities.dll&quot;"></Exec>
   </Target>
 
 </Project>
