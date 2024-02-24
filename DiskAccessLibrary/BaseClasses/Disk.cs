@@ -5,42 +5,45 @@
  * either version 3 of the License, or (at your option) any later version.
  */
 
-public abstract class Disk
+namespace DiskAccessLibrary
 {
-    /// <summary>
-    /// Sector refers to physical disk sector
-    /// </summary>
-    public abstract byte[] ReadSectors(long sectorIndex, int sectorCount);
-    public abstract void WriteSectors(long sectorIndex, byte[] data);
-
-    public byte[] ReadSector(long sectorIndex)
+    public abstract class Disk
     {
-        return ReadSectors(sectorIndex, 1);
-    }
+        /// <summary>
+        /// Sector refers to physical disk sector
+        /// </summary>
+        public abstract byte[] ReadSectors(long sectorIndex, int sectorCount);
+        public abstract void WriteSectors(long sectorIndex, byte[] data);
 
-    public abstract int BytesPerSector
-    {
-        get;
-    }
-
-    public abstract long Size
-    {
-        get;
-    }
-
-    public virtual bool IsReadOnly
-    {
-        get
+        public byte[] ReadSector(long sectorIndex)
         {
-            return false;
+            return ReadSectors(sectorIndex, 1);
         }
-    }
 
-    public long TotalSectors
-    {
-        get
+        public abstract int BytesPerSector
         {
-            return this.Size / this.BytesPerSector;
+            get;
+        }
+
+        public abstract long Size
+        {
+            get;
+        }
+
+        public virtual bool IsReadOnly
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        public long TotalSectors
+        {
+            get
+            {
+                return this.Size / this.BytesPerSector;
+            }
         }
     }
 }

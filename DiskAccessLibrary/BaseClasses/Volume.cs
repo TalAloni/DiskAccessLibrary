@@ -7,55 +7,58 @@
 using System;
 using System.Collections.Generic;
 
-public abstract class Volume
+namespace DiskAccessLibrary
 {
-    /// <summary>
-    /// Sector refers to physical disk sector, we can only read complete sectors
-    /// </summary>
-    public abstract byte[] ReadSectors(long sectorIndex, int sectorCount);
-    public abstract void WriteSectors(long sectorIndex, byte[] data);
-    
-    public byte[] ReadSector(long sectorIndex)
+    public abstract class Volume
     {
-        return ReadSectors(sectorIndex, 1);
-    }
+        /// <summary>
+        /// Sector refers to physical disk sector, we can only read complete sectors
+        /// </summary>
+        public abstract byte[] ReadSectors(long sectorIndex, int sectorCount);
+        public abstract void WriteSectors(long sectorIndex, byte[] data);
 
-    public void CheckBoundaries(long sectorIndex, int sectorCount)
-    {
-        if (sectorIndex < 0 || sectorIndex + sectorCount - 1 >= this.TotalSectors)
+        public byte[] ReadSector(long sectorIndex)
         {
-            throw new ArgumentOutOfRangeException("Attempted to access data outside of volume");
+            return ReadSectors(sectorIndex, 1);
         }
-    }
 
-    public abstract int BytesPerSector
-    {
-        get;
-    }
-
-    public abstract long Size
-    {
-        get;
-    }
-
-    public virtual bool IsReadOnly
-    {
-        get
+        public void CheckBoundaries(long sectorIndex, int sectorCount)
         {
-            return false;
+            if (sectorIndex < 0 || sectorIndex + sectorCount - 1 >= this.TotalSectors)
+            {
+                throw new ArgumentOutOfRangeException("Attempted to access data outside of volume");
+            }
         }
-    }
 
-    public abstract List<DiskExtent> Extents
-    {
-        get;
-    }
-
-    public long TotalSectors
-    {
-        get
+        public abstract int BytesPerSector
         {
-            return this.Size / this.BytesPerSector;
+            get;
+        }
+
+        public abstract long Size
+        {
+            get;
+        }
+
+        public virtual bool IsReadOnly
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        public abstract List<DiskExtent> Extents
+        {
+            get;
+        }
+
+        public long TotalSectors
+        {
+            get
+            {
+                return this.Size / this.BytesPerSector;
+            }
         }
     }
 }

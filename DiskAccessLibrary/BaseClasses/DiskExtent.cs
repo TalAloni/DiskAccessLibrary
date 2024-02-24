@@ -6,97 +6,100 @@
  */
 using System;
 
-public class DiskExtent
+namespace DiskAccessLibrary
 {
-    private Disk m_disk;
-    private long m_firstSector;
-    private long m_size; // In bytes
-
-    public DiskExtent(Disk disk, long firstSector, long size)
+    public class DiskExtent
     {
-        m_disk = disk;
-        m_firstSector = firstSector;
-        m_size = size;
-    }
+        private Disk m_disk;
+        private long m_firstSector;
+        private long m_size; // In bytes
 
-    public byte[] ReadSector(long sectorIndex)
-    {
-        return ReadSectors(sectorIndex, 1);
-    }
-
-    public byte[] ReadSectors(long sectorIndex, int sectorCount)
-    {
-        CheckBoundaries(sectorIndex, sectorCount);
-        return m_disk.ReadSectors(m_firstSector + sectorIndex, sectorCount);
-    }
-
-    public void WriteSectors(long sectorIndex, byte[] data)
-    {
-        CheckBoundaries(sectorIndex, data.Length / this.BytesPerSector);
-        m_disk.WriteSectors(m_firstSector + sectorIndex, data);
-    }
-
-    public void CheckBoundaries(long sectorIndex, int sectorCount)
-    {
-        if (sectorIndex < 0 || sectorIndex + (sectorCount - 1) >= this.TotalSectors)
+        public DiskExtent(Disk disk, long firstSector, long size)
         {
-            throw new ArgumentOutOfRangeException("Attempted to access data outside of volume");
+            m_disk = disk;
+            m_firstSector = firstSector;
+            m_size = size;
         }
-    }
 
-    public int BytesPerSector
-    {
-        get
+        public byte[] ReadSector(long sectorIndex)
         {
-            return m_disk.BytesPerSector;
+            return ReadSectors(sectorIndex, 1);
         }
-    }
 
-    public long Size
-    {
-        get
+        public byte[] ReadSectors(long sectorIndex, int sectorCount)
         {
-            return m_size;
+            CheckBoundaries(sectorIndex, sectorCount);
+            return m_disk.ReadSectors(m_firstSector + sectorIndex, sectorCount);
         }
-    }
 
-    public bool IsReadOnly
-    {
-        get
+        public void WriteSectors(long sectorIndex, byte[] data)
         {
-            return m_disk.IsReadOnly;
+            CheckBoundaries(sectorIndex, data.Length / this.BytesPerSector);
+            m_disk.WriteSectors(m_firstSector + sectorIndex, data);
         }
-    }
 
-    public long FirstSector
-    {
-        get
+        public void CheckBoundaries(long sectorIndex, int sectorCount)
         {
-            return m_firstSector;
+            if (sectorIndex < 0 || sectorIndex + (sectorCount - 1) >= this.TotalSectors)
+            {
+                throw new ArgumentOutOfRangeException("Attempted to access data outside of volume");
+            }
         }
-    }
 
-    public long TotalSectors
-    {
-        get
+        public int BytesPerSector
         {
-            return this.Size / this.BytesPerSector;
+            get
+            {
+                return m_disk.BytesPerSector;
+            }
         }
-    }
 
-    public long LastSector
-    {
-        get
+        public long Size
         {
-            return FirstSector + TotalSectors - 1;
+            get
+            {
+                return m_size;
+            }
         }
-    }
 
-    public Disk Disk
-    {
-        get
+        public bool IsReadOnly
         {
-            return m_disk;
+            get
+            {
+                return m_disk.IsReadOnly;
+            }
+        }
+
+        public long FirstSector
+        {
+            get
+            {
+                return m_firstSector;
+            }
+        }
+
+        public long TotalSectors
+        {
+            get
+            {
+                return this.Size / this.BytesPerSector;
+            }
+        }
+
+        public long LastSector
+        {
+            get
+            {
+                return FirstSector + TotalSectors - 1;
+            }
+        }
+
+        public Disk Disk
+        {
+            get
+            {
+                return m_disk;
+            }
         }
     }
 }
