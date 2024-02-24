@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Threading;
 using Utilities;
 
 namespace DiskAccessLibrary.FileSystems.NTFS
@@ -454,7 +453,7 @@ namespace DiskAccessLibrary.FileSystems.NTFS
             return builder.ToString();
         }
 
-        internal KeyValuePairList<long, long> AllocateClusters(long numberOfClusters)
+        internal List<KeyValuePair<long, long>> AllocateClusters(long numberOfClusters)
         {
             lock (m_bitmapLock)
             {
@@ -462,7 +461,7 @@ namespace DiskAccessLibrary.FileSystems.NTFS
             }
         }
 
-        internal KeyValuePairList<long, long> AllocateClusters(long desiredStartLCN, long numberOfClusters)
+        internal List<KeyValuePair<long, long>> AllocateClusters(long desiredStartLCN, long numberOfClusters)
         {
             lock (m_bitmapLock)
             {

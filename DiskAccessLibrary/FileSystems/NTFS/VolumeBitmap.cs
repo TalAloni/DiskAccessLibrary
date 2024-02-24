@@ -1,4 +1,4 @@
-/* Copyright (C) 2014-2018 Tal Aloni <tal.aloni.il@gmail.com>. All rights reserved.
+/* Copyright (C) 2014-2024 Tal Aloni <tal.aloni.il@gmail.com>. All rights reserved.
  * 
  * You can redistribute this program and/or modify it under the terms of
  * the GNU Lesser Public License as published by the Free Software Foundation,
@@ -6,7 +6,6 @@
  */
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Utilities;
 
 namespace DiskAccessLibrary.FileSystems.NTFS
@@ -30,9 +29,9 @@ namespace DiskAccessLibrary.FileSystems.NTFS
         /// <summary>
         /// The caller must verify that there are enough free clusters before calling this method.
         /// </summary>
-        public KeyValuePairList<long, long> AllocateClusters(long numberOfClusters)
+        public List<KeyValuePair<long, long>> AllocateClusters(long numberOfClusters)
         {
-            KeyValuePairList<long, long> runList = AllocateClusters(m_searchStartIndex, numberOfClusters);
+            List<KeyValuePair<long, long>> runList = AllocateClusters(m_searchStartIndex, numberOfClusters);
             long lastRunLCN = runList[runList.Count - 1].Key;
             long lastRunLength = runList[runList.Count - 1].Value;
             m_searchStartIndex = lastRunLCN + lastRunLength;
@@ -42,7 +41,7 @@ namespace DiskAccessLibrary.FileSystems.NTFS
         /// <summary>
         /// The caller must verify that there are enough free clusters before calling this method.
         /// </summary>
-        public KeyValuePairList<long, long> AllocateClusters(long desiredStartLCN, long numberOfClusters)
+        public List<KeyValuePair<long, long>> AllocateClusters(long desiredStartLCN, long numberOfClusters)
         {
             int bitsPerCluster = Volume.BytesPerCluster * 8;
             KeyValuePairList<long, long> freeClusterRunList = FindClustersToAllocate(desiredStartLCN, numberOfClusters);
