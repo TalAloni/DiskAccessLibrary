@@ -5,6 +5,7 @@
  * either version 3 of the License, or (at your option) any later version.
  */
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Utilities;
 
@@ -97,10 +98,10 @@ namespace DiskAccessLibrary.FileSystems.NTFS
         /// <summary>
         /// This method should only be used for informational purposes.
         /// </summary>
-        public KeyValuePairList<long, long> GetClustersInUse()
+        public List<KeyValuePair<long, long>> GetClustersInUse()
         {
             long clusterCount = HighestVCN - LowestVCN + 1;
-            KeyValuePairList<long, long> sequence = m_dataRunSequence.TranslateToLCN(0, clusterCount);
+            List<KeyValuePair<long, long>> sequence = m_dataRunSequence.TranslateToLCN(0, clusterCount);
             return sequence;
         }
 

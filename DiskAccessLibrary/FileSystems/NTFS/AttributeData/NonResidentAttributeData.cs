@@ -77,7 +77,7 @@ namespace DiskAccessLibrary.FileSystems.NTFS
             ulong firstBytePosition = (ulong)firstSectorIndex * (uint)bytesPerSector;
             if (firstBytePosition < ValidDataLength)
             {
-                KeyValuePairList<long, int> sequence = m_attributeRecord.DataRunSequence.TranslateToLBN(firstSectorIndex, count, sectorsPerCluster);
+                List<KeyValuePair<long, int>> sequence = m_attributeRecord.DataRunSequence.TranslateToLBN(firstSectorIndex, count, sectorsPerCluster);
                 long bytesRead = 0;
                 foreach (KeyValuePair<long, int> run in sequence)
                 {
@@ -171,7 +171,7 @@ namespace DiskAccessLibrary.FileSystems.NTFS
                 }
             }
 
-            KeyValuePairList<long, int> sequence = m_attributeRecord.DataRunSequence.TranslateToLBN(firstSectorIndex, sectorCount, sectorsPerCluster);
+            List<KeyValuePair<long, int>> sequence = m_attributeRecord.DataRunSequence.TranslateToLBN(firstSectorIndex, sectorCount, sectorsPerCluster);
             long bytesWritten = 0;
             foreach (KeyValuePair<long, int> run in sequence)
             {
@@ -225,7 +225,7 @@ namespace DiskAccessLibrary.FileSystems.NTFS
 
         private void AllocateAdditionalClusters(long clustersToAllocate)
         {
-            KeyValuePairList<long, long> freeClusterRunList;
+            List<KeyValuePair<long, long>> freeClusterRunList;
             DataRunSequence dataRuns = m_attributeRecord.DataRunSequence;
             if (dataRuns.Count == 0)
             {
@@ -270,7 +270,7 @@ namespace DiskAccessLibrary.FileSystems.NTFS
             long clustersToKeep = (long)Math.Ceiling((double)newLengthInBytes / m_volume.BytesPerCluster);
             if (clustersToKeep < ClusterCount)
             {
-                KeyValuePairList<long, long> clustersToDeallocate = m_attributeRecord.DataRunSequence.TranslateToLCN(clustersToKeep, ClusterCount - clustersToKeep);
+                List<KeyValuePair<long, long>> clustersToDeallocate = m_attributeRecord.DataRunSequence.TranslateToLCN(clustersToKeep, ClusterCount - clustersToKeep);
                 m_attributeRecord.DataRunSequence.Truncate(clustersToKeep);
                 m_attributeRecord.HighestVCN = clustersToKeep - 1;
                 m_attributeRecord.AllocatedLength = (ulong)(clustersToKeep * m_volume.BytesPerCluster);
