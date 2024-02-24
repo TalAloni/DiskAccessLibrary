@@ -1,4 +1,4 @@
-/* Copyright (C) 2014-2020 Tal Aloni <tal.aloni.il@gmail.com>. All rights reserved.
+/* Copyright (C) 2014-2024 Tal Aloni <tal.aloni.il@gmail.com>. All rights reserved.
  * 
  * You can redistribute this program and/or modify it under the terms of
  * the GNU Lesser Public License as published by the Free Software Foundation,
@@ -132,15 +132,15 @@ namespace DiskAccessLibrary.FileSystems.NTFS
                 throw new InvalidPathException(String.Format("'{0}' is not a directory", path));
             }
 
-            KeyValuePairList<MftSegmentReference, FileNameRecord> records = m_volume.GetFileNameRecordsInDirectory(directoryRecord.BaseSegmentReference);
+            List<KeyValuePair<MftSegmentReference, FileNameRecord>> records = m_volume.GetFileNameRecordsInDirectory(directoryRecord.BaseSegmentReference);
             List<FileSystemEntry> result = new List<FileSystemEntry>();
 
             path = FileSystem.GetDirectoryPath(path);
 
-            foreach (FileNameRecord record in records.Values)
+            foreach (KeyValuePair<MftSegmentReference, FileNameRecord> record in records)
             {
-                string fullPath = path + record.FileName;
-                FileSystemEntry entry = ToFileSystemEntry(fullPath, record);
+                string fullPath = path + record.Value.FileName;
+                FileSystemEntry entry = ToFileSystemEntry(fullPath, record.Value);
                 result.Add(entry);
             }
             return result;

@@ -1,4 +1,4 @@
-/* Copyright (C) 2014-2018 Tal Aloni <tal.aloni.il@gmail.com>. All rights reserved.
+/* Copyright (C) 2014-2024 Tal Aloni <tal.aloni.il@gmail.com>. All rights reserved.
  * 
  * You can redistribute this program and/or modify it under the terms of
  * the GNU Lesser Public License as published by the Free Software Foundation,
@@ -113,10 +113,10 @@ namespace DiskAccessLibrary.FileSystems.NTFS
             return false;
         }
 
-        public KeyValuePairList<MftSegmentReference, FileNameRecord> GetAllFileNameRecords()
+        public List<KeyValuePair<MftSegmentReference, FileNameRecord>> GetAllFileNameRecords()
         {
             KeyValuePairList<MftSegmentReference, FileNameRecord> result = new KeyValuePairList<MftSegmentReference, FileNameRecord>();
-            KeyValuePairList<MftSegmentReference, byte[]> entries = GetAllEntries();
+            List<KeyValuePair<MftSegmentReference, byte[]>> entries = GetAllEntries();
             foreach (KeyValuePair<MftSegmentReference, byte[]> entry in entries)
             {
                 FileNameRecord fileNameRecord = new FileNameRecord(entry.Value, 0);
