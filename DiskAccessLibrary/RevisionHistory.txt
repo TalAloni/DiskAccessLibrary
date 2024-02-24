@@ -295,3 +295,8 @@ Revision History:
         NTFS: NonResidentAttributeRecord: Validate LowestVCN, HighestVCN and mappingPairsOffset.
         NTFS: NonResidentAttributeRecord: Read TotalAllocated if record indicates compression.
         IOExceptionHelper.ThrowIOError: Mark as public.
+        
+1.6.1 - Internalize Utilities.
+
+1.6.2 - Disk, DiskExtent, Volume: Update namespace to DiskAccessLibrary.
+        Set DebugType to embedded and EmbedAllSources to true.
