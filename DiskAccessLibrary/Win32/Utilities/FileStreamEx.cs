@@ -1,4 +1,4 @@
-/* Copyright (C) 2014 Tal Aloni <tal.aloni.il@gmail.com>. All rights reserved.
+/* Copyright (C) 2014-2024 Tal Aloni <tal.aloni.il@gmail.com>. All rights reserved.
  * 
  * You can redistribute this program and/or modify it under the terms of
  * the GNU Lesser Public License as published by the Free Software Foundation,
@@ -122,7 +122,7 @@ namespace DiskAccessLibrary
         /// </remarks>
         public int ReadOverlapped(byte[] array, int offset, int count, long position)
         {
-            uint temp; // will not be updated on async operation
+            uint numberOfBytesReadOnSyncOperation; // will not be updated on async operation
             ManualResetEvent completionEvent = new ManualResetEvent(false);
             OVERLAPPED overlapped = new OVERLAPPED();
             overlapped.Offset = position;
@@ -138,13 +138,13 @@ namespace DiskAccessLibrary
             if (offset == 0)
             {
                 bufferHandle = GCHandle.Alloc(array, GCHandleType.Pinned);
-                success = ReadFile(m_handle, array, (uint)count, out temp, lpOverlapped);
+                success = ReadFile(m_handle, array, (uint)count, out numberOfBytesReadOnSyncOperation, lpOverlapped);
             }
             else
             {
                 buffer = new byte[count];
                 bufferHandle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
-                success = ReadFile(m_handle, buffer, (uint)buffer.Length, out temp, lpOverlapped);
+                success = ReadFile(m_handle, buffer, (uint)buffer.Length, out numberOfBytesReadOnSyncOperation, lpOverlapped);
             }
 
             uint numberOfBytesRead = 0;
@@ -157,6 +157,11 @@ namespace DiskAccessLibrary
                     IOExceptionHelper.ThrowIOError(errorCode, message);
                 }
                 bool completed = GetOverlappedResult(m_handle, lpOverlapped, out numberOfBytesRead, true);
+            }
+            else
+            {
+                // FILE_FLAG_OVERLAPPED has not been used
+                numberOfBytesRead = numberOfBytesReadOnSyncOperation;
             }
             bufferHandle.Free();
             completionEvent.Close();
