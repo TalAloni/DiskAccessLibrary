@@ -34,8 +34,8 @@ namespace DiskAccessLibrary.FileSystems.Abstractions
             LastWriteTime = lastWriteTime;
             LastAccessTime = lastAccessTime;
             IsHidden = isHidden;
-            IsReadonly = isHidden;
-            IsArchived = isHidden;
+            IsReadonly = isReadonly;
+            IsArchived = isArchived;
 
             if (isDirectory)
             {
