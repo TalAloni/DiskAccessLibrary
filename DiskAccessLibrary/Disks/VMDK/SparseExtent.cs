@@ -112,9 +112,24 @@ namespace DiskAccessLibrary.VMDK
             int grainIndexInBuffer = (int)grainIndex % grainTableEntriesPerSector;
             int grainTableEntriesToReadFromTable = (int)Math.Ceiling((double)sectorCount / grainTableEntriesPerSector);
             int sectorsToReadFromTable = 1 + (int)Math.Floor((double)(grainIndexInBuffer + grainTableEntriesToReadFromTable - 1) / grainTableEntriesPerSector);
+
+            if (m_descriptor.DiskType == VirtualMachineDiskType.StreamOptimized)
+            {
+                // For MonolithicSparse we assume that the grain table array is consecutive.
+                // (for MonolithicSparse it is not even necessary to read the entire grain directory)
+                int numberOfSectorsPerGT = (int)(m_header.NumGTEsPerGT * 4 / BytesPerSector);
+                if (sectorsToReadFromTable - grainTableSectorOffset > numberOfSectorsPerGT)
+                {
+                    throw new NotImplementedException("A single read/write cannot exceed grain table boundary");
+                }
+            }
             byte[] grainTableBuffer = m_file.ReadSectors(grainTableStartSectorIndex + grainTableSectorOffset, sectorsToReadFromTable);
 
             long sectorIndexInGrain = sectorIndex % (long)m_header.GrainSize;
+            if (sectorIndexInGrain > 0 && m_header.UseCompressionForGrains)
+            {
+                throw new NotImplementedException("Read cannot start from the middle of a compressed grain");
+            }
 
             KeyValuePairList<long, int> result = new KeyValuePairList<long, int>();
             uint grainOffset = LittleEndianConverter.ToUInt32(grainTableBuffer, grainIndexInBuffer * 4);
