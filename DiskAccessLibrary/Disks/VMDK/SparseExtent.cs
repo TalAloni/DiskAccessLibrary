@@ -1,4 +1,4 @@
-/* Copyright (C) 2014-2023 Tal Aloni <tal.aloni.il@gmail.com>. All rights reserved.
+/* Copyright (C) 2014-2025 Tal Aloni <tal.aloni.il@gmail.com>. All rights reserved.
  * 
  * You can redistribute this program and/or modify it under the terms of
  * the GNU Lesser Public License as published by the Free Software Foundation,
@@ -116,8 +116,9 @@ namespace DiskAccessLibrary.VMDK
                 sectorsProcessedInGrain = (int)Math.Min(sectorsLeft, (long)m_header.GrainSize);
                 long lastSectorIndex = result[result.Count - 1].Key;
                 int lastSectorCount = result[result.Count - 1].Value;
-                if (lastSectorIndex + lastSectorCount == grainOffset)
+                if (lastSectorIndex + lastSectorCount == grainOffset && !m_header.UseCompressionForGrains)
                 {
+                    // Note: For compression we want the caller to process each grain separately
                     result[result.Count - 1] = new KeyValuePair<long, int>(lastSectorIndex, lastSectorCount + sectorsProcessedInGrain);
                 }
                 else
