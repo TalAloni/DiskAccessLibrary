@@ -17,8 +17,8 @@ namespace DiskAccessLibrary.VMDK
         private bool m_isReadOnly;
         private SparseExtentHeader m_header;
         private VirtualMachineDiskDescriptor m_descriptor;
-        private uint? m_grainTableArrayStartSector;
-        private uint? m_redundantGrainTableArrayStartSector;
+        private byte[] m_grainDirectoryBytes;
+        private byte[] m_redundantGrainDirectoryBytes;
 
         public SparseExtent(string path) : this(path, false)
         {
@@ -76,22 +76,43 @@ namespace DiskAccessLibrary.VMDK
             return m_file.ReleaseLock();
         }
 
+        private byte[] ReadGrainDirectoryBytes(bool useRedundant)
+        {
+            ulong grainTableOffset = useRedundant? m_header.RedundantGDOffset : m_header.GDOffset;
+            ulong numberOfGrains = m_header.Capacity / m_header.GrainSize;
+            int numberOfGrainTables = (int)Math.Ceiling((double)numberOfGrains / m_header.NumGTEsPerGT);
+            int grainDirectorySizeInBytes = numberOfGrainTables * 4;
+            int grainDirectorySizeInSectors = (int)Math.Ceiling((double)grainDirectorySizeInBytes / BytesPerSector);
+            return m_file.ReadSectors((long)grainTableOffset, grainDirectorySizeInSectors);
+        }
+
+        private void ReadGrainDirectory()
+        {
+            m_grainDirectoryBytes = ReadGrainDirectoryBytes(false);
+        }
+
+        private void ReadRedundantGrainDirectory()
+        {
+            m_redundantGrainDirectoryBytes = ReadGrainDirectoryBytes(true);
+        }
+
         private KeyValuePairList<long, int> MapSectors(long sectorIndex, int sectorCount, bool allocateUnmappedSectors)
         {
-            if (m_grainTableArrayStartSector == null)
+            if (m_grainDirectoryBytes == null)
             {
-                ulong grainTableOffset = m_header.GDOffset;
-                byte[] grainDirectoryBytes = m_file.ReadSectors((long)grainTableOffset, 1);
-                // We assume that the grain table array is consecutive and do not bother reading the entire grain directory
-                m_grainTableArrayStartSector = LittleEndianConverter.ToUInt32(grainDirectoryBytes, 0);
+                ReadGrainDirectory();
             }
 
             long grainIndex = sectorIndex / (long)m_header.GrainSize;
             int grainTableEntriesPerSector = BytesPerSector / 4;
-            long grainSectorIndexInTableArray = grainIndex / grainTableEntriesPerSector;
+            int grainTableIndex = (int)(grainIndex / m_header.NumGTEsPerGT); // The index in the grain directory
+            uint grainTableStartSectorIndex = LittleEndianConverter.ToUInt32(m_grainDirectoryBytes, grainTableIndex * 4);
+            int offsetInGrainTable = (int)(grainIndex % m_header.NumGTEsPerGT);
+            int grainTableSectorOffset = offsetInGrainTable / grainTableEntriesPerSector; // The sector offset in the table containing the grain entry corresponding to sectorIndex
             int grainIndexInBuffer = (int)grainIndex % grainTableEntriesPerSector;
-            int sectorsToReadFromTable = 1 + (int)Math.Ceiling((double)(sectorCount - (grainTableEntriesPerSector - grainIndexInBuffer)) / grainTableEntriesPerSector);
-            byte[] grainTableBuffer = m_file.ReadSectors(m_grainTableArrayStartSector.Value + grainSectorIndexInTableArray, sectorsToReadFromTable);
+            int grainTableEntriesToReadFromTable = (int)Math.Ceiling((double)sectorCount / grainTableEntriesPerSector);
+            int sectorsToReadFromTable = 1 + (int)Math.Floor((double)(grainIndexInBuffer + grainTableEntriesToReadFromTable - 1) / grainTableEntriesPerSector);
+            byte[] grainTableBuffer = m_file.ReadSectors(grainTableStartSectorIndex + grainTableSectorOffset, sectorsToReadFromTable);
 
             long sectorIndexInGrain = sectorIndex % (long)m_header.GrainSize;
 
@@ -138,18 +159,16 @@ namespace DiskAccessLibrary.VMDK
             // Allocate unallocated grains
             if (updateGrainTableArrays)
             {
-                m_file.WriteSectors(m_grainTableArrayStartSector.Value + grainSectorIndexInTableArray, grainTableBuffer);
+                m_file.WriteSectors(grainTableStartSectorIndex + grainTableSectorOffset, grainTableBuffer);
 
                 if (m_header.HasRedundantGrainTable)
                 {
-                    if (m_redundantGrainTableArrayStartSector == null)
+                    if (m_redundantGrainDirectoryBytes == null)
                     {
-                        ulong redundantGrainTableOffset = m_header.RedundantGDOffset;
-                        byte[] redundantGrainDirectoryBytes = m_file.ReadSectors((long)redundantGrainTableOffset, 1);
-                        // We assume that the grain table array is consecutive and do not bother reading the entire grain directory
-                        m_redundantGrainTableArrayStartSector = LittleEndianConverter.ToUInt32(redundantGrainDirectoryBytes, 0);
+                        ReadRedundantGrainDirectory();
                     }
-                    m_file.WriteSectors(m_redundantGrainTableArrayStartSector.Value + grainSectorIndexInTableArray, grainTableBuffer);
+                    uint redundantGrainTableStartSectorIndex = LittleEndianConverter.ToUInt32(m_redundantGrainDirectoryBytes, grainTableIndex * 4);
+                    m_file.WriteSectors(redundantGrainTableStartSectorIndex + grainTableSectorOffset, grainTableBuffer);
                 }
             }
 
