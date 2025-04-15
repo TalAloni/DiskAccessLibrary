@@ -123,6 +123,16 @@ namespace DiskAccessLibrary.VMDK
                     throw new NotImplementedException("A single read/write cannot exceed grain table boundary");
                 }
             }
+
+            if (grainTableStartSectorIndex == 0)
+            {
+                // Indicates sparse grain table, might be related to the undocumented sparse extent header v3
+                return new KeyValuePairList<long, int>()
+                {
+                    new KeyValuePair<long, int>(0, sectorCount)
+                };
+            }
+
             byte[] grainTableBuffer = m_file.ReadSectors(grainTableStartSectorIndex + grainTableSectorOffset, sectorsToReadFromTable);
 
             long sectorIndexInGrain = sectorIndex % (long)m_header.GrainSize;
