@@ -112,7 +112,7 @@ namespace DiskAccessLibrary.VMDK
         {
             get
             {
-                return (Version == 1);
+                return (Version >= 1 && Version <= 3);
             }
         }
 
