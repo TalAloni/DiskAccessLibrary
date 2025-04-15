@@ -35,6 +35,11 @@ namespace DiskAccessLibrary.VMDK
                 throw new NotSupportedException("Sparse extent header version is not supported");
             }
 
+            if ((m_header.Flags & SparseExtentHeaderFlags.UseZeroedGrainGTEs) > 0)
+            {
+                throw new NotSupportedException("Zeroed grain GTEs are not supported");
+            }
+
             if (m_header.CompressionAlgirithm != SparseExtentCompression.None)
             {
                 throw new NotSupportedException("Sparse extent compression is not supported");
