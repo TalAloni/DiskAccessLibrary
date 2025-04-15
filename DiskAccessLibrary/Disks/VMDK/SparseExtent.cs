@@ -51,6 +51,13 @@ namespace DiskAccessLibrary.VMDK
                 string text = ASCIIEncoding.ASCII.GetString(descriptorBytes);
                 List<string> lines = VirtualMachineDiskDescriptor.GetLines(text);
                 m_descriptor = new VirtualMachineDiskDescriptor(lines);
+
+                if (m_descriptor.DiskType == VirtualMachineDiskType.StreamOptimized)
+                {
+                    // Read the footer which contains the grainTableOffset
+                    byte[] footerBytes = m_file.ReadSector(m_file.TotalSectors - 2);
+                    m_header = new SparseExtentHeader(footerBytes);
+                }
             }
         }
 
