@@ -25,6 +25,15 @@
     <PackageReference Include="MSTest.TestFramework" Version="2.2.10" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="TestData\VMDK\MonolithicSparse.vmdk">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestData\VMDK\StreamOptimized.vmdk">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <Target Name="RemoveMergedReferences" AfterTargets="ResolveAssemblyReferences">
     <ItemGroup Condition="'$(Configuration)' == 'Publish'">
       <ReferencePath Remove="@(ReferencePath)" Condition="'%(FileName)' == 'Utilities'" />
