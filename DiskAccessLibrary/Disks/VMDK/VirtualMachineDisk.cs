@@ -1,4 +1,4 @@
-/* Copyright (C) 2014-2023 Tal Aloni <tal.aloni.il@gmail.com>. All rights reserved.
+/* Copyright (C) 2014-2025 Tal Aloni <tal.aloni.il@gmail.com>. All rights reserved.
  * 
  * You can redistribute this program and/or modify it under the terms of
  * the GNU Lesser Public License as published by the Free Software Foundation,
@@ -81,7 +81,9 @@ namespace DiskAccessLibrary
                 throw new NotImplementedException("Unsupported VMDK disk type");
             }
 
-            if (isDescriptorEmbedded && m_descriptor.DiskType != VirtualMachineDiskType.MonolithicSparse)
+            if (isDescriptorEmbedded &&
+                m_descriptor.DiskType != VirtualMachineDiskType.MonolithicSparse &&
+                m_descriptor.DiskType != VirtualMachineDiskType.StreamOptimized)
             {
                 throw new NotImplementedException("Unsupported VMDK disk type");
             }
