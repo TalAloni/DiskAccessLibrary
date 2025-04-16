@@ -226,11 +226,8 @@ namespace DiskAccessLibrary.VMDK
                     readSize -= offsetFromGrainStartInBytes;
                 }
 
-                if (entry.Key == 0) // 0 means that the grain is not yet allocated
-                {
-                    readBuffer = new byte[readSize];
-                }
-                else
+                bool isGrainAllocated = entry.Key != 0;
+                if (isGrainAllocated)
                 {
                     if (!m_header.UseCompressionForGrains)
                     {
@@ -248,10 +245,10 @@ namespace DiskAccessLibrary.VMDK
                         }
                         readBuffer = CompressionHelper.Decompress(readBuffer, grainMarkerSize, (int)m_header.GrainSize * BytesPerSector);
                     }
-                }
 
-                int readStartOffset = entryIndex == 0 ? offsetFromGrainStartInBytes : 0;
-                Array.Copy(readBuffer, readStartOffset, result, offset, readSize);
+                    int readStartOffset = entryIndex == 0 ? offsetFromGrainStartInBytes : 0;
+                    Array.Copy(readBuffer, readStartOffset, result, offset, readSize);
+                }
                 offset += readSize;
             }
 

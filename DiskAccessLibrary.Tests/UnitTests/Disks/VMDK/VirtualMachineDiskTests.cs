@@ -73,6 +73,14 @@ namespace DiskAccessLibrary.Tests.UnitTests.Disks.VMDK
         }
 
         [TestMethod]
+        public void StreamOptimized_ReadSectors_FromTheMiddleOfUnallocatedGrainToItsEnd()
+        {
+            VirtualMachineDisk virtualMachineDisk = new VirtualMachineDisk(StreamOptimizedeVmdkPath);
+            byte[] buffer = virtualMachineDisk.ReadSectors(129, 127);
+            Assert.AreEqual(VirtualMachineDisk.BytesPerDiskSector * 127, buffer.Length);
+        }
+
+        [TestMethod]
         public void StreamOptimized_ReadSectors_FromTheMiddleOfACompressedGrainToTheMiddleOfNextGrain()
         {
             VirtualMachineDisk virtualMachineDisk = new VirtualMachineDisk(StreamOptimizedeVmdkPath);
