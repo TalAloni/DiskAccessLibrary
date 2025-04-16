@@ -45,6 +45,51 @@ namespace DiskAccessLibrary.Tests.UnitTests.Disks.VMDK
             Assert.AreEqual(VirtualMachineDisk.BytesPerDiskSector, buffer.Length);
         }
 
+        [TestMethod]
+        public void MonolithicSparse_ReadSector_FromTheMiddleOfAGrain()
+        {
+            VirtualMachineDisk virtualMachineDisk = new VirtualMachineDisk(MonolithicSparseVmdkPath);
+            byte[] buffer = virtualMachineDisk.ReadSector(1);
+            Assert.AreEqual(VirtualMachineDisk.BytesPerDiskSector, buffer.Length);
+            Assert.AreEqual(1, BigEndianConverter.ToInt64(buffer, 0));
+        }
+
+        [TestMethod]
+        public void StreamOptimized_ReadSector_FromTheMiddleOfACompressedGrain()
+        {
+            VirtualMachineDisk virtualMachineDisk = new VirtualMachineDisk(StreamOptimizedeVmdkPath);
+            byte[] buffer = virtualMachineDisk.ReadSector(1);
+            Assert.AreEqual(VirtualMachineDisk.BytesPerDiskSector, buffer.Length);
+            Assert.AreEqual(1, BigEndianConverter.ToInt64(buffer, 0));
+        }
+
+        [TestMethod]
+        public void StreamOptimized_ReadSectors_FromTheMiddleOfACompressedGrainToItsEnd()
+        {
+            VirtualMachineDisk virtualMachineDisk = new VirtualMachineDisk(StreamOptimizedeVmdkPath);
+            byte[] buffer = virtualMachineDisk.ReadSectors(1, 127);
+            Assert.AreEqual(VirtualMachineDisk.BytesPerDiskSector * 127, buffer.Length);
+            Assert.AreEqual(1, BigEndianConverter.ToInt64(buffer, 0));
+        }
+
+        [TestMethod]
+        public void StreamOptimized_ReadSectors_FromTheMiddleOfACompressedGrainToTheMiddleOfNextGrain()
+        {
+            VirtualMachineDisk virtualMachineDisk = new VirtualMachineDisk(StreamOptimizedeVmdkPath);
+            byte[] buffer = virtualMachineDisk.ReadSectors(1, 128);
+            Assert.AreEqual(VirtualMachineDisk.BytesPerDiskSector * 128, buffer.Length);
+            Assert.AreEqual(1, BigEndianConverter.ToInt64(buffer, 0));
+        }
+
+        [TestMethod]
+        public void StreamOptimized_ReadSectors_FromTheMiddleOfACompressedGrainToTheEndOfNextGrain()
+        {
+            VirtualMachineDisk virtualMachineDisk = new VirtualMachineDisk(StreamOptimizedeVmdkPath);
+            byte[] buffer = virtualMachineDisk.ReadSectors(1, 255);
+            Assert.AreEqual(VirtualMachineDisk.BytesPerDiskSector * 255, buffer.Length);
+            Assert.AreEqual(1, BigEndianConverter.ToInt64(buffer, 0));
+        }
+
         private void TestDiskContent(VirtualMachineDisk virtualMachineDisk)
         {
             int readSizeInSectors = 128;

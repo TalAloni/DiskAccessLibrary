@@ -207,11 +207,25 @@ namespace DiskAccessLibrary.VMDK
             CheckBoundaries(sectorIndex, sectorCount);
             byte[] result = new byte[sectorCount * this.BytesPerSector];
             int offset = 0;
-            KeyValuePairList<long, int> map = MapSectors(sectorIndex, sectorCount, false);
-            foreach (KeyValuePair<long, int> entry in map)
+            int offsetFromGrainStartInBytes = 0;
+            if (m_header.UseCompressionForGrains)
             {
+                int offsetFromGrainStartInSectors = (int)((ulong)sectorIndex % m_header.GrainSize);
+                sectorIndex -= offsetFromGrainStartInSectors;
+                sectorCount += offsetFromGrainStartInSectors;
+                offsetFromGrainStartInBytes = offsetFromGrainStartInSectors * BytesPerSector;
+            }
+            KeyValuePairList<long, int> map = MapSectors(sectorIndex, sectorCount, false);
+            for (int entryIndex = 0; entryIndex < map.Count; entryIndex++)
+            {
+                KeyValuePair<long, int> entry = map[entryIndex];
                 byte[] readBuffer;
                 int readSize = entry.Value * this.BytesPerSector;
+                if (entryIndex == 0)
+                {
+                    readSize -= offsetFromGrainStartInBytes;
+                }
+
                 if (entry.Key == 0) // 0 means that the grain is not yet allocated
                 {
                     readBuffer = new byte[readSize];
@@ -236,7 +250,8 @@ namespace DiskAccessLibrary.VMDK
                     }
                 }
 
-                Array.Copy(readBuffer, 0, result, offset, readSize);
+                int readStartOffset = entryIndex == 0 ? offsetFromGrainStartInBytes : 0;
+                Array.Copy(readBuffer, readStartOffset, result, offset, readSize);
                 offset += readSize;
             }
 
