@@ -210,33 +210,33 @@ namespace DiskAccessLibrary.VMDK
             KeyValuePairList<long, int> map = MapSectors(sectorIndex, sectorCount, false);
             foreach (KeyValuePair<long, int> entry in map)
             {
-                byte[] temp;
+                byte[] readBuffer;
                 int readSize = entry.Value * this.BytesPerSector;
                 if (entry.Key == 0) // 0 means that the grain is not yet allocated
                 {
-                    temp = new byte[readSize];
+                    readBuffer = new byte[readSize];
                 }
                 else
                 {
                     if (!m_header.UseCompressionForGrains)
                     {
-                        temp = m_file.ReadSectors(entry.Key, entry.Value);
+                        readBuffer = m_file.ReadSectors(entry.Key, entry.Value);
                     }
                     else
                     {
-                        temp = m_file.ReadSector(entry.Key);
-                        uint compressedSize = LittleEndianConverter.ToUInt32(temp, 8);
+                        readBuffer = m_file.ReadSector(entry.Key);
+                        uint compressedSize = LittleEndianConverter.ToUInt32(readBuffer, 8);
                         int grainMarkerSize = 12;
                         int sectorsToRead = (int)Math.Ceiling((double)(grainMarkerSize + compressedSize) / BytesPerSector);
                         if (sectorsToRead > 1)
                         {
-                            temp = ByteUtils.Concatenate(temp, m_file.ReadSectors(entry.Key + 1, sectorsToRead - 1));
+                            readBuffer = ByteUtils.Concatenate(readBuffer, m_file.ReadSectors(entry.Key + 1, sectorsToRead - 1));
                         }
-                        temp = CompressionHelper.Decompress(temp, grainMarkerSize, (int)m_header.GrainSize * BytesPerSector);
+                        readBuffer = CompressionHelper.Decompress(readBuffer, grainMarkerSize, (int)m_header.GrainSize * BytesPerSector);
                     }
                 }
 
-                Array.Copy(temp, 0, result, offset, readSize);
+                Array.Copy(readBuffer, 0, result, offset, readSize);
                 offset += readSize;
             }
 
