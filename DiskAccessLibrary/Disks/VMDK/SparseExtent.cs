@@ -40,11 +40,6 @@ namespace DiskAccessLibrary.VMDK
                 throw new NotSupportedException("Zeroed grain GTEs are not supported");
             }
 
-            if (m_header.CompressionAlgirithm != SparseExtentCompression.None)
-            {
-                throw new NotSupportedException("Sparse extent compression is not supported");
-            }
-
             if (m_header.DescriptorOffset > 0)
             {
                 byte[] descriptorBytes = m_file.ReadSectors((long)m_header.DescriptorOffset, (int)m_header.DescriptorSize);
@@ -222,8 +217,24 @@ namespace DiskAccessLibrary.VMDK
                 }
                 else
                 {
-                    temp = m_file.ReadSectors(entry.Key, entry.Value);
+                    if (!m_header.UseCompressionForGrains)
+                    {
+                        temp = m_file.ReadSectors(entry.Key, entry.Value);
+                    }
+                    else
+                    {
+                        temp = m_file.ReadSector(entry.Key);
+                        uint compressedSize = LittleEndianConverter.ToUInt32(temp, 8);
+                        int grainMarkerSize = 12;
+                        int sectorsToRead = (int)Math.Ceiling((double)(grainMarkerSize + compressedSize) / BytesPerSector);
+                        if (sectorsToRead > 1)
+                        {
+                            temp = ByteUtils.Concatenate(temp, m_file.ReadSectors(entry.Key + 1, sectorsToRead - 1));
+                        }
+                        temp = CompressionHelper.Decompress(temp, grainMarkerSize, (int)m_header.GrainSize * BytesPerSector);
+                    }
                 }
+
                 Array.Copy(temp, 0, result, offset, temp.Length);
                 offset += temp.Length;
             }
@@ -236,6 +247,11 @@ namespace DiskAccessLibrary.VMDK
             if (m_isReadOnly)
             {
                 throw new UnauthorizedAccessException("Attempted to perform write on a readonly disk");
+            }
+
+            if (m_header.UseCompressionForGrains)
+            {
+                throw new NotSupportedException("Writing to compressed sparse extent is not supported");
             }
 
             int sectorCount = data.Length / BytesPerSector;
