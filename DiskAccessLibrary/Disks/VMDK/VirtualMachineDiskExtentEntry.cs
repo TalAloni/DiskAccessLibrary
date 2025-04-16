@@ -17,7 +17,7 @@ namespace DiskAccessLibrary.VMDK
         public long SizeInSectors;
         public ExtentType ExtentType;
         public string FileName;
-        public long? Offset;
+        public long? Offset; // Specified only for flat extents. for preallocated virtual disks, this number is zero.
 
         public string GetEntryLine()
         {
