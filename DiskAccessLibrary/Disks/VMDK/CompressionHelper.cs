@@ -20,16 +20,18 @@ namespace DiskAccessLibrary.VMDK
             }
             MemoryStream inputStream = new MemoryStream(compressedBytes);
             inputStream.Seek(readOffset, SeekOrigin.Begin);
-            DeflateStream deflateStream = new DeflateStream(inputStream, CompressionMode.Decompress);
             byte[] buffer = new byte[bufferSize];
             int writeOffset = 0;
             int bytesRead;
-            do
+            using (DeflateStream deflateStream = new DeflateStream(inputStream, CompressionMode.Decompress))
             {
-                bytesRead = deflateStream.Read(buffer, writeOffset, buffer.Length - writeOffset);
-                writeOffset += bytesRead;
+                do
+                {
+                    bytesRead = deflateStream.Read(buffer, writeOffset, buffer.Length - writeOffset);
+                    writeOffset += bytesRead;
+                }
+                while (bytesRead > 0 && writeOffset < buffer.Length);
             }
-            while (bytesRead > 0 && writeOffset < buffer.Length);
 
             return buffer;
         }
