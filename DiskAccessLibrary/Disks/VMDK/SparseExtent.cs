@@ -211,9 +211,10 @@ namespace DiskAccessLibrary.VMDK
             foreach (KeyValuePair<long, int> entry in map)
             {
                 byte[] temp;
+                int readSize = entry.Value * this.BytesPerSector;
                 if (entry.Key == 0) // 0 means that the grain is not yet allocated
                 {
-                    temp = new byte[entry.Value * this.BytesPerSector];
+                    temp = new byte[readSize];
                 }
                 else
                 {
@@ -235,8 +236,8 @@ namespace DiskAccessLibrary.VMDK
                     }
                 }
 
-                Array.Copy(temp, 0, result, offset, temp.Length);
-                offset += temp.Length;
+                Array.Copy(temp, 0, result, offset, readSize);
+                offset += readSize;
             }
 
             return result;
