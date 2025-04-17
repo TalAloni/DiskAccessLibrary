@@ -40,6 +40,11 @@ namespace DiskAccessLibrary.VMDK
                 throw new NotSupportedException("Zeroed grain GTEs are not supported");
             }
 
+            ReadEmbeddedDescriptor();
+        }
+
+        private void ReadEmbeddedDescriptor()
+        {
             if (m_header.DescriptorOffset > 0)
             {
                 byte[] descriptorBytes = m_file.ReadSectors((long)m_header.DescriptorOffset, (int)m_header.DescriptorSize);
