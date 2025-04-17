@@ -20,14 +20,7 @@ namespace DiskAccessLibrary
             RawDiskImage.Create(extentPath, size);
 
             VirtualMachineDiskDescriptor descriptor = VirtualMachineDiskDescriptor.CreateDescriptor(VirtualMachineDiskType.MonolithicFlat, size);
-
-            VirtualMachineDiskExtentEntry extentEntry = new VirtualMachineDiskExtentEntry();
-            extentEntry.ReadAccess = true;
-            extentEntry.WriteAccess = true;
-            extentEntry.SizeInSectors = size / BytesPerDiskSector;
-            extentEntry.ExtentType = ExtentType.Flat;
-            extentEntry.FileName = extentFileName;
-            extentEntry.Offset = 0;
+            VirtualMachineDiskExtentEntry extentEntry = CreateExtentEntry(size, ExtentType.Flat, extentFileName);
             descriptor.ExtentEntries.Add(extentEntry);
             descriptor.SaveToFile(path);
 
@@ -39,13 +32,7 @@ namespace DiskAccessLibrary
             VirtualMachineDiskDescriptor descriptor = VirtualMachineDiskDescriptor.CreateDescriptor(VirtualMachineDiskType.MonolithicSparse, size);
             string fileName = System.IO.Path.GetFileName(path);
 
-            long sizeInSectors = size / BytesPerDiskSector;
-            VirtualMachineDiskExtentEntry extentEntry = new VirtualMachineDiskExtentEntry();
-            extentEntry.ReadAccess = true;
-            extentEntry.WriteAccess = true;
-            extentEntry.SizeInSectors = sizeInSectors;
-            extentEntry.ExtentType = ExtentType.Sparse;
-            extentEntry.FileName = fileName;
+            VirtualMachineDiskExtentEntry extentEntry = CreateExtentEntry(size, ExtentType.Sparse, fileName);
             descriptor.ExtentEntries.Add(extentEntry);
 
             byte[] descriptorBytes = descriptor.GetDescriptorBytes();
@@ -54,6 +41,7 @@ namespace DiskAccessLibrary
             int descriptorSizeInSectors = (int)Math.Ceiling((decimal)desiredDescriptorLength / BytesPerDiskSector);
             descriptorBytes = ByteUtils.Concatenate(descriptorBytes, new byte[descriptorSizeInSectors * BytesPerDiskSector - descriptorBytes.Length]);
 
+            long sizeInSectors = size / BytesPerDiskSector;
             int grainSizeInSectors = 128;
             int numberOfSectorsRepresentedByGrainTable = SparseExtentHeader.NumberOfGrainTableEntriesPerGrainTable * grainSizeInSectors;
             int numberOfGrainTables = (int)Math.Ceiling((decimal)sizeInSectors / numberOfSectorsRepresentedByGrainTable);
@@ -84,6 +72,22 @@ namespace DiskAccessLibrary
             WritePadding(sparseExtentImage, grainDirectorySectorIndex + grainDirectorySizeInSectors + grainTableArraySizeInSectors, grainTableArrayPaddingSizeInSectors);
             WritePadding(sparseExtentImage, sparseMetadataSizeInSectorsWithoutPadding, sparseMetadataSizeInSectorsIncludingPadding - sparseMetadataSizeInSectorsWithoutPadding);
             return new VirtualMachineDisk(path);
+        }
+
+        private static VirtualMachineDiskExtentEntry CreateExtentEntry(long extentSize, ExtentType extentType, string extentFileName)
+        {
+            VirtualMachineDiskExtentEntry extentEntry = new VirtualMachineDiskExtentEntry();
+            extentEntry.ReadAccess = true;
+            extentEntry.WriteAccess = true;
+            extentEntry.SizeInSectors = extentSize / BytesPerDiskSector;
+            extentEntry.ExtentType = extentType;
+            extentEntry.FileName = extentFileName;
+            if (extentType == ExtentType.Flat)
+            {
+                extentEntry.Offset = 0;
+            }
+
+            return extentEntry;
         }
 
         private static void WriteGrainMetadata(RawDiskImage sparseExtentImage, long sectorIndex, int numberOfGrainTables)
