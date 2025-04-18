@@ -19,25 +19,10 @@ namespace DiskAccessLibrary.VMDK
         private byte[] m_grainDirectoryBytes;
         private byte[] m_redundantGrainDirectoryBytes;
 
-        public SparseExtent(string path) : this(path, false)
+        protected internal SparseExtent(RawDiskImage file, SparseExtentHeader header) : base(file.Path, file.IsReadOnly)
         {
-        }
-
-        public SparseExtent(string path, bool isReadOnly) : base(path, isReadOnly)
-        {
-            m_file = new RawDiskImage(path, VirtualMachineDisk.BytesPerDiskSector, isReadOnly);
-            byte[] headerBytes = m_file.ReadSector(0);
-            m_header = new SparseExtentHeader(headerBytes);
-            if (!m_header.IsSupported)
-            {
-                throw new NotSupportedException("Sparse extent header version is not supported");
-            }
-
-            if ((m_header.Flags & SparseExtentHeaderFlags.UseZeroedGrainGTEs) > 0)
-            {
-                throw new NotSupportedException("Zeroed grain GTEs are not supported");
-            }
-
+            m_file = file;
+            m_header = header;
             ReadEmbeddedDescriptor();
         }
 
@@ -327,6 +312,24 @@ namespace DiskAccessLibrary.VMDK
             {
                 return m_file;
             }
+        }
+
+        public static SparseExtent OpenSparseExtent(string path, bool isReadOnly)
+        {
+            RawDiskImage file = new RawDiskImage(path, VirtualMachineDisk.BytesPerDiskSector, isReadOnly);
+            byte[] headerBytes = file.ReadSector(0);
+            SparseExtentHeader header = new SparseExtentHeader(headerBytes);
+            if (!header.IsSupported)
+            {
+                throw new NotSupportedException("Sparse extent header version is not supported");
+            }
+
+            if ((header.Flags & SparseExtentHeaderFlags.UseZeroedGrainGTEs) > 0)
+            {
+                throw new NotSupportedException("Zeroed grain GTEs are not supported");
+            }
+
+            return new SparseExtent(file, header);
         }
     }
 }
