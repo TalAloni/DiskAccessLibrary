@@ -58,6 +58,7 @@ namespace DiskAccessLibrary
             long redundantGrainDirectorySectorIndex = 1 + descriptorSizeInSectors;
             long grainDirectorySectorIndex = redundantGrainDirectorySectorIndex + grainDirectorySizeInSectors + numberOfGrainTables * grainTableSizeInSectors + grainTableArrayPaddingSizeInSectors;
             SparseExtentHeader sparseExtentHeader = new SparseExtentHeader((ulong)sizeInSectors, (ulong)grainSizeInSectors, (ulong)(descriptorBytes.Length / BytesPerDiskSector));
+            sparseExtentHeader.HasRedundantGrainTable = true;
             sparseExtentHeader.DescriptorOffset = 1;
             sparseExtentHeader.RedundantGDOffset = (ulong)redundantGrainDirectorySectorIndex;
             sparseExtentHeader.GDOffset = (ulong)grainDirectorySectorIndex;

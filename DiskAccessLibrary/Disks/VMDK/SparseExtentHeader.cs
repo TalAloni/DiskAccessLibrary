@@ -44,13 +44,11 @@ namespace DiskAccessLibrary.VMDK
 
             Signature = ValidSignature;
             Version = 1;
-            Flags = SparseExtentHeaderFlags.ValidNewLineDetectionTest | SparseExtentHeaderFlags.HasRedundantGrainTable;
+            Flags = SparseExtentHeaderFlags.ValidNewLineDetectionTest;
             Capacity = totalSectors;
             GrainSize = grainSize;
             DescriptorOffset = 1;
             DescriptorSize = descriptorSizeInSectors;
-            RedundantGDOffset = 1 + DescriptorSize;
-            GDOffset = 1 + DescriptorSize;
             NumGTEsPerGT = NumberOfGrainTableEntriesPerGrainTable; 
             SingleEndLineChar = '\n';
             NonEndLineChar = ' ';
