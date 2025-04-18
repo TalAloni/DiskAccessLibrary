@@ -219,5 +219,13 @@ namespace DiskAccessLibrary
                        m_descriptor.DiskType == VirtualMachineDiskType.TwoGbMaxExtentSparse;
             }
         }
+
+        private DiskImage Extent
+        {
+            get
+            {
+                return m_extent;
+            }
+        }
     }
 }
