@@ -75,6 +75,46 @@ namespace DiskAccessLibrary
             return new VirtualMachineDisk(path);
         }
 
+        /// <summary>
+        /// Stream-optimized VMDK does not support random write access.
+        /// The location of each subsequent write must be equal to or larger than the end of the last write.
+        /// ExclusiveLock must be called before writing, and ReleaseLock must be called for grain directory and footer to be written.
+        /// </summary>
+        public static VirtualMachineDisk CreateStreamOptimized(string path, long size)
+        {
+            VirtualMachineDiskDescriptor descriptor = VirtualMachineDiskDescriptor.CreateDescriptor(VirtualMachineDiskType.StreamOptimized, size);
+            string fileName = System.IO.Path.GetFileName(path);
+
+            VirtualMachineDiskExtentEntry extentEntry = CreateExtentEntry(size, ExtentType.Sparse, fileName);
+            extentEntry.WriteAccess = false;
+            descriptor.ExtentEntries.Add(extentEntry);
+
+            byte[] descriptorBytes = descriptor.GetDescriptorBytes();
+            int descriptorLength = descriptorBytes.Length;
+            int descriptorSizeInSectors = (int)Math.Ceiling((decimal)descriptorLength / BytesPerDiskSector);
+            int paddedDescriptorLength = Math.Max(descriptorBytes.Length, 127 * BytesPerDiskSector);
+            int paddedDescriptorSizeInSectors = (int)Math.Ceiling((decimal)paddedDescriptorLength / BytesPerDiskSector);
+            descriptorBytes = ByteUtils.Concatenate(descriptorBytes, new byte[paddedDescriptorSizeInSectors * BytesPerDiskSector - descriptorBytes.Length]);
+
+            long sizeInSectors = size / BytesPerDiskSector;
+            int grainSizeInSectors = 128;
+
+            SparseExtentHeader sparseExtentHeader = new SparseExtentHeader((ulong)sizeInSectors, (ulong)grainSizeInSectors, (ulong)descriptorSizeInSectors);
+            sparseExtentHeader.UseCompressionForGrains = true;
+            sparseExtentHeader.HasMarkers = true;
+            sparseExtentHeader.Version = 3;
+            sparseExtentHeader.DescriptorOffset = 1;
+            sparseExtentHeader.GDOffset = 0xFFFFFFFFFFFFFFFF;
+            sparseExtentHeader.OverHead = 0x80;
+            sparseExtentHeader.CompressionAlgirithm = SparseExtentCompression.Deflate;
+
+            RawDiskImage sparseExtentImage = RawDiskImage.Create(path, (1 + paddedDescriptorSizeInSectors) * BytesPerDiskSector);
+            sparseExtentImage.WriteSectors(0, sparseExtentHeader.GetBytes());
+            sparseExtentImage.WriteSectors(1, descriptorBytes);
+
+            return new VirtualMachineDisk(path);
+        }
+
         private static VirtualMachineDiskExtentEntry CreateExtentEntry(long extentSize, ExtentType extentType, string extentFileName)
         {
             VirtualMachineDiskExtentEntry extentEntry = new VirtualMachineDiskExtentEntry();

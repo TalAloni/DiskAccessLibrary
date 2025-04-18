@@ -37,9 +37,12 @@ namespace DiskAccessLibrary.VMDK
 
                 if (m_descriptor.DiskType == VirtualMachineDiskType.StreamOptimized)
                 {
-                    // Read the footer which contains the grainTableOffset
-                    byte[] footerBytes = m_file.ReadSector(m_file.TotalSectors - 2);
-                    m_header = new SparseExtentHeader(footerBytes);
+                    if (!(this is StreamOptimizedWriteOnlySparseExtent)) // In new stream-optimized sparse extent, the footer has not been written yet
+                    {
+                        // Read the footer which contains the grainTableOffset
+                        byte[] footerBytes = m_file.ReadSector(m_file.TotalSectors - 2);
+                        m_header = new SparseExtentHeader(footerBytes);
+                    }
                 }
             }
         }
@@ -329,7 +332,28 @@ namespace DiskAccessLibrary.VMDK
                 throw new NotSupportedException("Zeroed grain GTEs are not supported");
             }
 
-            return new SparseExtent(file, header);
+            if ((long)header.OverHead == file.TotalSectors && header.UseCompressionForGrains && header.HasMarkers)
+            {
+                // Special case: New stream-optimized sparse extent
+                return new StreamOptimizedWriteOnlySparseExtent(file, header);
+            }
+            else
+            {
+                return new SparseExtent(file, header);
+            }
+        }
+
+        protected static bool IsAllZeros(byte[] array, int offset, int count)
+        {
+            for (int index = 0; index < count; index++)
+            {
+                if (array[offset + index] != 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }
