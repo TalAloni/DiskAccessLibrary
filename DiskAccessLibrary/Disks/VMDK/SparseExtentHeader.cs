@@ -20,7 +20,7 @@ namespace DiskAccessLibrary.VMDK
         public string Signature; // MagicNumber
         public uint Version;
         public SparseExtentHeaderFlags Flags;
-        public ulong Capacity; // Should be a multiple of the grain size
+        public ulong Capacity; // Expressed in sectors, should be a multiple of the grain size
         public ulong GrainSize; // Expressed in sectors
         public ulong DescriptorOffset; // Expressed in sectors
         public ulong DescriptorSize; // Expressed in sectors
