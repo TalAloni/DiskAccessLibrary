@@ -155,7 +155,8 @@ namespace DiskAccessLibrary.VMDK
                 sectorsProcessedInGrain = (int)Math.Min(sectorsLeft, (long)m_header.GrainSize);
                 long lastSectorIndex = result[result.Count - 1].Key;
                 int lastSectorCount = result[result.Count - 1].Value;
-                if (lastSectorIndex + lastSectorCount == grainOffset && !m_header.UseCompressionForGrains)
+                if (((lastSectorIndex == 0 && grainOffset == 0) || lastSectorIndex + lastSectorCount == grainOffset) &&
+                    !m_header.UseCompressionForGrains)
                 {
                     // Note: For compression we want the caller to process each grain separately
                     result[result.Count - 1] = new KeyValuePair<long, int>(lastSectorIndex, lastSectorCount + sectorsProcessedInGrain);
