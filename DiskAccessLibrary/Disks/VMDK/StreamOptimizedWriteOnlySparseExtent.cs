@@ -218,5 +218,17 @@ namespace DiskAccessLibrary.VMDK
 
             return buffer;
         }
+
+        public bool UseFastestCompression
+        {
+            get
+            {
+                return m_useFastestCompression;
+            }
+            set
+            {
+                m_useFastestCompression = value;
+            }
+        }
     }
 }

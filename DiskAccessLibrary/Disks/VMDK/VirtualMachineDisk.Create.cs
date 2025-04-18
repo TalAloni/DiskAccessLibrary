@@ -75,12 +75,17 @@ namespace DiskAccessLibrary
             return new VirtualMachineDisk(path);
         }
 
+        public static VirtualMachineDisk CreateStreamOptimized(string path, long size)
+        {
+            return CreateStreamOptimized(path, size, true);
+        }
+
         /// <summary>
         /// Stream-optimized VMDK does not support random write access.
         /// The location of each subsequent write must be equal to or larger than the end of the last write.
         /// ExclusiveLock must be called before writing, and ReleaseLock must be called for grain directory and footer to be written.
         /// </summary>
-        public static VirtualMachineDisk CreateStreamOptimized(string path, long size)
+        public static VirtualMachineDisk CreateStreamOptimized(string path, long size, bool useFastestCompression)
         {
             VirtualMachineDiskDescriptor descriptor = VirtualMachineDiskDescriptor.CreateDescriptor(VirtualMachineDiskType.StreamOptimized, size);
             string fileName = System.IO.Path.GetFileName(path);
@@ -112,7 +117,9 @@ namespace DiskAccessLibrary
             sparseExtentImage.WriteSectors(0, sparseExtentHeader.GetBytes());
             sparseExtentImage.WriteSectors(1, descriptorBytes);
 
-            return new VirtualMachineDisk(path);
+            VirtualMachineDisk virtualMachineDisk = new VirtualMachineDisk(path);
+            ((StreamOptimizedWriteOnlySparseExtent)virtualMachineDisk.Extent).UseFastestCompression = useFastestCompression;
+            return virtualMachineDisk;
         }
 
         private static VirtualMachineDiskExtentEntry CreateExtentEntry(long extentSize, ExtentType extentType, string extentFileName)
