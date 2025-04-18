@@ -122,6 +122,17 @@ namespace DiskAccessLibrary.VMDK
             {
                 return (Flags & SparseExtentHeaderFlags.HasRedundantGrainTable) > 0;
             }
+            set
+            {
+                if (value)
+                {
+                    Flags |= SparseExtentHeaderFlags.HasRedundantGrainTable;
+                }
+                else
+                {
+                    Flags &= ~SparseExtentHeaderFlags.HasRedundantGrainTable;
+                }
+            }
         }
 
         public bool UseCompressionForGrains
@@ -129,6 +140,36 @@ namespace DiskAccessLibrary.VMDK
             get
             {
                 return (Flags & SparseExtentHeaderFlags.UseCompressionForGrains) > 0;
+            }
+            set
+            {
+                if (value)
+                {
+                    Flags |= SparseExtentHeaderFlags.UseCompressionForGrains;
+                }
+                else
+                {
+                    Flags &= ~SparseExtentHeaderFlags.UseCompressionForGrains;
+                }
+            }
+        }
+
+        public bool HasMarkers
+        {
+            get
+            {
+                return (Flags & SparseExtentHeaderFlags.HasMarkers) > 0;
+            }
+            set
+            {
+                if (value)
+                {
+                    Flags |= SparseExtentHeaderFlags.HasMarkers;
+                }
+                else
+                {
+                    Flags &= ~SparseExtentHeaderFlags.HasMarkers;
+                }
             }
         }
     }
