@@ -312,5 +312,21 @@ namespace DiskAccessLibrary.VMDK
                 return m_descriptor;
             }
         }
+
+        protected internal SparseExtentHeader Header
+        {
+            get
+            {
+                return m_header;
+            }
+        }
+
+        protected internal RawDiskImage File
+        {
+            get
+            {
+                return m_file;
+            }
+        }
     }
 }
