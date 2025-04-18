@@ -11,9 +11,15 @@ namespace DiskAccessLibrary.VMDK
 {
     internal static class CompressionHelper
     {
+        private const byte DeflateCompressionMethod = 0x78;
+        private const byte FastestCompressionFlag = 0x01;
+        private const byte MaximumCompressionFlag = 0xDA;
+
         public static byte[] Decompress(byte[] compressedBytes, int readOffset, int bufferSize)
         {
-            if (compressedBytes[readOffset] == 0x78 && compressedBytes[readOffset + 1] == 0x01)
+            if (compressedBytes[readOffset] == DeflateCompressionMethod &&
+                (compressedBytes[readOffset + 1] == FastestCompressionFlag ||
+                 compressedBytes[readOffset + 1] == MaximumCompressionFlag))
             {
                 // Skip zlib header
                 readOffset += 2;
