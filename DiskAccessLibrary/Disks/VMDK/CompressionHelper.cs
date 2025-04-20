@@ -83,9 +83,9 @@ namespace DiskAccessLibrary.VMDK
 
         private static uint ComputeAdler32Checksum(byte[] data, int offset, int count)
         {
-            // compute Adler-32:
+            // Compute Adler-32:
             ushort a1 = 1, a2 = 0;
-            for (int index = offset; index < count; index++)
+            for (int index = offset; index < offset + count; index++)
             {
                 byte b = data[index];
                 a1 = (ushort)((a1 + b) % 65521);
