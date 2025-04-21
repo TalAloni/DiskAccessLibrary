@@ -302,3 +302,10 @@ Revision History:
         Set DebugType to embedded and EmbedAllSources to true.
 
 1.6.3 - Internalized the Utilities.KeyValuePairList class.
+
+1.6.4 - FileStreamEx: ReadOverlapped: Fix support for sync file handles.
+        FileSystems: Abstractions: Fix IsReadonly / IsArchived assignment logic in FileSystemEntry constructor.
+        VMDK: Added ability to read from a stream-optimized VMDK.
+        VMDK: Added ability to create a stream-optimized VMDK.
+        VMDK: Monolithic-sparse: Bugfix: Do not set offset in sparse extent description.
+        VMDK: Do not allocate grains to write zeros in monolithic-sparse VMDK.
