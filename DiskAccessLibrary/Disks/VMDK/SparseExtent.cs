@@ -18,6 +18,7 @@ namespace DiskAccessLibrary.VMDK
         private VirtualMachineDiskDescriptor m_descriptor;
         private byte[] m_grainDirectoryBytes;
         private byte[] m_redundantGrainDirectoryBytes;
+        private long m_sectorsToAllocate = 0;
 
         protected internal SparseExtent(RawDiskImage file, SparseExtentHeader header) : base(file.Path, file.IsReadOnly)
         {
@@ -141,7 +142,7 @@ namespace DiskAccessLibrary.VMDK
             {
                 if (!IsAllZeros(data, 0, sectorsProcessedInGrain * BytesPerSector)) // No need to allocate grain to write zeros
                 {
-                    grainOffset = AllocateGrain();
+                    grainOffset = GetNextAllocatedGrainSectorOffset();
                     LittleEndianWriter.WriteUInt32(grainTableBuffer, grainIndexInBuffer * 4, grainOffset);
                     updateGrainTableArrays = true;
                 }
@@ -164,7 +165,7 @@ namespace DiskAccessLibrary.VMDK
                 {
                     if (!IsAllZeros(data, (sectorCount - sectorsLeft) * BytesPerSector, sectorsProcessedInGrain * BytesPerSector)) // No need to allocate grain to write zeros
                     {
-                        grainOffset = AllocateGrain();
+                        grainOffset = GetNextAllocatedGrainSectorOffset();
                         LittleEndianWriter.WriteUInt32(grainTableBuffer, grainIndexInBuffer * 4, grainOffset);
                         updateGrainTableArrays = true;
                     }
@@ -185,8 +186,8 @@ namespace DiskAccessLibrary.VMDK
                 sectorsLeft -= sectorsProcessedInGrain;
             }
 
-            // Allocate unallocated grains
-            if (updateGrainTableArrays)
+            AllocateGrains();
+            if (updateGrainTableArrays) // Update grain table to point to newly allocated grains
             {
                 m_file.WriteSectors(grainTableStartSectorIndex + grainTableSectorOffset, grainTableBuffer);
 
@@ -204,11 +205,17 @@ namespace DiskAccessLibrary.VMDK
             return result;
         }
 
-        private uint AllocateGrain()
+        private uint GetNextAllocatedGrainSectorOffset()
         {
-            uint grainOffet = (uint)m_file.TotalSectors;
-            m_file.Extend((long)m_header.GrainSize * BytesPerSector);
+            uint grainOffet = (uint)(m_file.TotalSectors + m_sectorsToAllocate);
+            m_sectorsToAllocate += (long)m_header.GrainSize;
             return grainOffet;
+        }
+
+        private void AllocateGrains()
+        {
+            m_file.Extend(m_sectorsToAllocate * BytesPerSector);
+            m_sectorsToAllocate = 0;
         }
 
         public override byte[] ReadSectors(long sectorIndex, int sectorCount)
