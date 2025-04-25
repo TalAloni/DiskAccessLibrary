@@ -120,7 +120,7 @@ namespace DiskAccessLibrary.VMDK
 
                     LittleEndianWriter.WriteUInt32(m_nextGrainTable, (firstGrainIndexInGrainTable + grainOffset) * 4, (uint)nextGrainWritePosition);
 
-                    byte[] compressedData = CompressionHelper.Compress(data, readOffset, grainSizeInBytes, m_useFastestCompression);
+                    byte[] compressedData = ZLibCompressionHelper.Compress(data, readOffset, grainSizeInBytes, m_useFastestCompression);
                     byte[] grainBytes = GetGrainBytes(sectorIndex + grainOffset * (int)Header.GrainSize, compressedData);
                     buffer = ByteUtils.Concatenate(buffer, grainBytes);
 

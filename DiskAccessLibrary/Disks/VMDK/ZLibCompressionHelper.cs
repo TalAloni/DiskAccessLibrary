@@ -11,7 +11,7 @@ using Utilities;
 
 namespace DiskAccessLibrary.VMDK
 {
-    internal static class CompressionHelper
+    internal static class ZLibCompressionHelper
     {
         private const byte DeflateCompressionMethod = 0x78;
         private const byte FastestCompressionFlag = 0x01;
