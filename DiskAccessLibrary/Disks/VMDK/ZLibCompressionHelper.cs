@@ -11,7 +11,14 @@ using Utilities;
 
 namespace DiskAccessLibrary.VMDK
 {
-    internal static class ZLibCompressionHelper
+    /// <remarks>
+    /// Note: Virtual Disk Format 1.1 / 5.0 specifications explicitly states that
+    /// grain data is compressed with RFC 1951 (DEFLATE).
+    /// However, in practice VMware products use RFC 1950 (ZLIB data format), which
+    /// is a wrapper around raw deflate compressed data (RFC 1951).
+    /// VMware products will verify the Adler-32 checksum in the ZLIB footer, so raw DEFLATE cannot be used.
+    /// </remarks>
+    public static class ZLibCompressionHelper
     {
         private const byte DeflateCompressionMethod = 0x78;
         private const byte FastestCompressionFlag = 0x01;
