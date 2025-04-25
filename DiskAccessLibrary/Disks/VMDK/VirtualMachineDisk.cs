@@ -211,12 +211,11 @@ namespace DiskAccessLibrary
             }
         }
 
-        public bool IsSparseDisk
+        public VirtualMachineDiskType DiskType
         {
             get
             {
-                return m_descriptor.DiskType == VirtualMachineDiskType.MonolithicSparse ||
-                       m_descriptor.DiskType == VirtualMachineDiskType.TwoGbMaxExtentSparse;
+                return m_descriptor.DiskType;
             }
         }
 
