@@ -26,8 +26,14 @@ namespace DiskAccessLibrary.VMDK
         private const byte DefaultCompressionFlag = 0x9C;
         private const byte MaximumCompressionFlag = 0xDA;
 
-        public static byte[] Decompress(byte[] compressedBytes, int readOffset, int bufferSize)
+        public static byte[] Decompress(byte[] compressedBytes, int readOffset, int count, int bufferSize)
         {
+            return Decompress(compressedBytes, readOffset, count, bufferSize, false);
+        }
+
+        public static byte[] Decompress(byte[] compressedBytes, int readOffset, int count, int bufferSize, bool verifyChecksum)
+        {
+            bool hasZLibHeader = false;
             if (compressedBytes[readOffset] == DeflateCompressionMethod &&
                 (compressedBytes[readOffset + 1] == FastestCompressionFlag ||
                 compressedBytes[readOffset + 1] == FastCompressionFlag ||
@@ -36,6 +42,7 @@ namespace DiskAccessLibrary.VMDK
             {
                 // Skip zlib header
                 readOffset += 2;
+                hasZLibHeader = true;
             }
             MemoryStream inputStream = new MemoryStream(compressedBytes);
             inputStream.Seek(readOffset, SeekOrigin.Begin);
@@ -50,6 +57,16 @@ namespace DiskAccessLibrary.VMDK
                     writeOffset += bytesRead;
                 }
                 while (bytesRead > 0 && writeOffset < buffer.Length);
+            }
+
+            if (hasZLibHeader && verifyChecksum)
+            {
+                uint expectedChecksum = BigEndianConverter.ToUInt32(compressedBytes, readOffset - 2 + count - 4);
+                uint checksum = ComputeAdler32Checksum(buffer, 0, buffer.Length);
+                if (expectedChecksum != checksum)
+                {
+                    throw new InvalidDataException("Adler32 checksum of decompressed data does not match stored value");
+                }
             }
 
             return buffer;

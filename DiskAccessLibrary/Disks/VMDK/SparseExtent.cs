@@ -259,7 +259,7 @@ namespace DiskAccessLibrary.VMDK
                         {
                             readBuffer = ByteUtils.Concatenate(readBuffer, m_file.ReadSectors(entry.Key + 1, sectorsToRead - 1));
                         }
-                        readBuffer = ZLibCompressionHelper.Decompress(readBuffer, grainMarkerSize, (int)m_header.GrainSize * BytesPerSector);
+                        readBuffer = ZLibCompressionHelper.Decompress(readBuffer, grainMarkerSize, (int)compressedSize, (int)m_header.GrainSize * BytesPerSector);
                     }
 
                     int readStartOffset = entryIndex == 0 ? offsetFromGrainStartInBytes : 0;
