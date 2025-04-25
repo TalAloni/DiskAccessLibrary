@@ -22,12 +22,16 @@ namespace DiskAccessLibrary.VMDK
     {
         private const byte DeflateCompressionMethod = 0x78;
         private const byte FastestCompressionFlag = 0x01;
+        private const byte FastCompressionFlag = 0x5E;
+        private const byte DefaultCompressionFlag = 0x9C;
         private const byte MaximumCompressionFlag = 0xDA;
 
         public static byte[] Decompress(byte[] compressedBytes, int readOffset, int bufferSize)
         {
             if (compressedBytes[readOffset] == DeflateCompressionMethod &&
                 (compressedBytes[readOffset + 1] == FastestCompressionFlag ||
+                compressedBytes[readOffset + 1] == FastCompressionFlag ||
+                compressedBytes[readOffset + 1] == DefaultCompressionFlag ||
                  compressedBytes[readOffset + 1] == MaximumCompressionFlag))
             {
                 // Skip zlib header
