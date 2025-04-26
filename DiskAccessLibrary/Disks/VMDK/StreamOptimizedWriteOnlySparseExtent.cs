@@ -213,7 +213,7 @@ namespace DiskAccessLibrary.VMDK
             int paddedLengthInBytes = paddedLengthInSectors * BytesPerSector;
             byte[] buffer = new byte[paddedLengthInBytes];
             LittleEndianWriter.WriteUInt64(buffer, 0, (ulong)sectorIndex);
-            LittleEndianWriter.WriteUInt64(buffer, 8, (uint)compressedData.Length);
+            LittleEndianWriter.WriteUInt32(buffer, 8, (uint)compressedData.Length);
             ByteWriter.WriteBytes(buffer, 12, compressedData);
 
             return buffer;
