@@ -5,17 +5,16 @@
  * either version 3 of the License, or (at your option) any later version.
  */
 using System;
-using System.IO;
 using Utilities;
 
 namespace DiskAccessLibrary.VMDK
 {
     internal class StreamOptimizedWriteOnlySparseExtent : SparseExtent
     {
-        const uint MarkerEOS = 0;
-        const uint MarkerGT = 1;
-        const uint MarkerGD = 2;
-        const uint MarkerFooter = 3;
+        private const uint MarkerEOS = 0;
+        private const uint MarkerGT = 1;
+        private const uint MarkerGD = 2;
+        private const uint MarkerFooter = 3;
 
         private bool m_hasExclusiveLock = false;
         private long m_indexOfLastSectorWritten = -1;
