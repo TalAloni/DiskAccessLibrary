@@ -8,7 +8,7 @@ using System;
 
 namespace Utilities
 {
-	public partial class Conversion
+	public static partial class Conversion
 	{
         public static short ToInt16(object obj)
         {

@@ -10,7 +10,7 @@ using System.Text;
 
 namespace Utilities
 {
-    public class QuotedStringUtils
+    public static class QuotedStringUtils
     {
         public static string Quote(string str)
         {

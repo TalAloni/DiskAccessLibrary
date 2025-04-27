@@ -9,7 +9,7 @@ using System.IO;
 
 namespace Utilities
 {
-    public class BigEndianWriter
+    public static class BigEndianWriter
     {
         public static void WriteInt16(byte[] buffer, int offset, short value)
         {

@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace Utilities
 {
-    public class BigEndianConverter
+    public static class BigEndianConverter
     {
         public static ushort ToUInt16(byte[] buffer, int offset)
         {

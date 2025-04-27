@@ -10,7 +10,7 @@ using System.Text;
 
 namespace Utilities
 {
-    public class ByteWriter
+    public static class ByteWriter
     {
         public static void WriteByte(byte[] buffer, int offset, byte value)
         {

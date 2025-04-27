@@ -9,7 +9,7 @@ using System.IO;
 
 namespace Utilities
 {
-    public class LittleEndianReader
+    public static class LittleEndianReader
     {
         public static short ReadInt16(byte[] buffer, ref int offset)
         {

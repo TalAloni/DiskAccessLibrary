@@ -9,7 +9,7 @@ using System.IO;
 
 namespace Utilities
 {
-    public class LittleEndianWriter
+    public static class LittleEndianWriter
     {
         public static void WriteUInt16(byte[] buffer, int offset, ushort value)
         {

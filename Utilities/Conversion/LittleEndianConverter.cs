@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace Utilities
 {
-    public class LittleEndianConverter
+    public static class LittleEndianConverter
     {
         public static ushort ToUInt16(byte[] buffer, int offset)
         {

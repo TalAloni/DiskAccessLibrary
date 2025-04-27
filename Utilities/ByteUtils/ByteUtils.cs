@@ -9,7 +9,7 @@ using System.IO;
 
 namespace Utilities
 {
-    public class ByteUtils
+    public static class ByteUtils
     {
         public static byte[] Concatenate(byte[] a, byte[] b)
         {

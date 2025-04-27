@@ -10,7 +10,7 @@ using System.Text;
 
 namespace Utilities
 {
-    public class ByteReader
+    public static class ByteReader
     {
         public static byte ReadByte(byte[] buffer, int offset)
         {
