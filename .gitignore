@@ -35,6 +35,9 @@ TestResult.xml
 [Rr]eleasePS/
 dlldata.c
 
+# Visual Studio cache/options directory
+.vs/
+
 *_i.c
 *_p.c
 *_i.h
