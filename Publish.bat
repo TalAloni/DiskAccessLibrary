@@ -1,0 +1,1 @@
+dotnet pack DiskAccessLibrary/DiskAccessLibrary.csproj -c Publish
