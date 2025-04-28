@@ -214,8 +214,11 @@ namespace DiskAccessLibrary.VMDK
 
         private void AllocateGrains()
         {
-            m_file.Extend(m_sectorsToAllocate * BytesPerSector);
-            m_sectorsToAllocate = 0;
+            if (m_sectorsToAllocate > 0)
+            {
+                m_file.Extend(m_sectorsToAllocate * BytesPerSector);
+                m_sectorsToAllocate = 0;
+            }
         }
 
         public override byte[] ReadSectors(long sectorIndex, int sectorCount)
