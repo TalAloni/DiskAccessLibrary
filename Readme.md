@@ -25,6 +25,7 @@ the structure has been reverse engineered ( https://flatcap.github.io/linux-ntfs
 [iSCSI Console](https://github.com/TalAloni/iSCSIConsole)  
 [Hard Disk Validator](https://github.com/TalAloni/HardDiskValidator)  
 [Raw Disk Copier](https://github.com/TalAloni/RawDiskCopier)  
+[VmdkZeroFree](https://github.com/TalAloni/VmdkZeroFree)  
 
 Contact:
 ========
