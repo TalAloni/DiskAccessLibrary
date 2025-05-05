@@ -1,4 +1,4 @@
-/* Copyright (C) 2014 Tal Aloni <tal.aloni.il@gmail.com>. All rights reserved.
+/* Copyright (C) 2014-2025 Tal Aloni <tal.aloni.il@gmail.com>. All rights reserved.
  * 
  * You can redistribute this program and/or modify it under the terms of
  * the GNU Lesser Public License as published by the Free Software Foundation,
@@ -19,6 +19,14 @@ namespace DiskAccessLibrary
         public MBRPartition(byte partitionType, Disk disk, long firstSector, long size) : base(disk, firstSector, size)
         {
             m_partitionType = partitionType;
+        }
+
+        public byte PartitionType
+        {
+            get
+            {
+                return m_partitionType;
+            }
         }
 
         public PartitionTypeName PartitionTypeName
