@@ -121,7 +121,7 @@ namespace DiskAccessLibrary.VHD
         public static uint CalculateChecksum(byte[] buffer)
         {
             uint checksum = 0;
-            for (int index = 0; index < Length; index++)
+            for (int index = 0; index < buffer.Length; index++)
             {
                 checksum += buffer[index];
             }
@@ -132,3 +132,4 @@ namespace DiskAccessLibrary.VHD
         }
     }
 }
+
