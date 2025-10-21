@@ -65,6 +65,19 @@ namespace Utilities
             return ReadUTF16String(buffer, offset - numberOfBytes, numberOfCharacters);
         }
 
+        public static string ReadUTF16BEString(byte[] buffer, int offset, int numberOfCharacters)
+        {
+            int numberOfBytes = numberOfCharacters * 2;
+            return Encoding.BigEndianUnicode.GetString(buffer, offset, numberOfBytes);
+        }
+
+        public static string ReadUTF16BEString(byte[] buffer, ref int offset, int numberOfCharacters)
+        {
+            int numberOfBytes = numberOfCharacters * 2;
+            offset += numberOfBytes;
+            return ReadUTF16BEString(buffer, offset - numberOfBytes, numberOfCharacters);
+        }
+
         public static string ReadNullTerminatedAnsiString(byte[] buffer, int offset)
         {
             StringBuilder builder = new StringBuilder();

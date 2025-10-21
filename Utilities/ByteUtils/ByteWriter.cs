@@ -77,6 +77,16 @@ namespace Utilities
             WriteUTF16String(buffer, ref offset, value, value.Length);
         }
 
+        public static void WriteUTF16BEString(byte[] buffer, int offset, string value)
+        {
+            WriteUTF16BEString(buffer, offset, value, value.Length);
+        }
+
+        public static void WriteUTF16BEString(byte[] buffer, ref int offset, string value)
+        {
+            WriteUTF16BEString(buffer, ref offset, value, value.Length);
+        }
+
         public static void WriteUTF16String(byte[] buffer, int offset, string value, int maximumNumberOfCharacters)
         {
             byte[] bytes = UnicodeEncoding.Unicode.GetBytes(value);
@@ -87,6 +97,19 @@ namespace Utilities
         public static void WriteUTF16String(byte[] buffer, ref int offset, string value, int numberOfCharacters)
         {
             WriteUTF16String(buffer, offset, value, numberOfCharacters);
+            offset += numberOfCharacters * 2;
+        }
+
+        public static void WriteUTF16BEString(byte[] buffer, int offset, string value, int maximumNumberOfCharacters)
+        {
+            byte[] bytes = UnicodeEncoding.BigEndianUnicode.GetBytes(value);
+            int maximumNumberOfBytes = Math.Min(value.Length, maximumNumberOfCharacters) * 2;
+            Array.Copy(bytes, 0, buffer, offset, maximumNumberOfBytes);
+        }
+
+        public static void WriteUTF16BEString(byte[] buffer, ref int offset, string value, int numberOfCharacters)
+        {
+            WriteUTF16BEString(buffer, offset, value, numberOfCharacters);
             offset += numberOfCharacters * 2;
         }
 
