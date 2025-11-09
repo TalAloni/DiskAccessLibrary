@@ -65,7 +65,7 @@ namespace DiskAccessLibrary.VHD
             ParentUniqueID = BigEndianConverter.ToGuid(buffer, 0x28);
             ParentTimeStamp = BigEndianConverter.ToUInt32(buffer, 0x38);
             Reserved = BigEndianConverter.ToUInt32(buffer, 0x3C);
-            ParentUnicodeName = ByteReader.ReadUTF16String(buffer, 0x40, 256).TrimEnd('\0');
+            ParentUnicodeName = ByteReader.ReadUTF16BEString(buffer, 0x40, 256).TrimEnd('\0');
             ParentLocatorEntry1 = new ParentLocatorEntry(buffer, 0x240);
             ParentLocatorEntry2 = new ParentLocatorEntry(buffer, 0x258);
             ParentLocatorEntry3 = new ParentLocatorEntry(buffer, 0x270);
@@ -94,7 +94,7 @@ namespace DiskAccessLibrary.VHD
             BigEndianWriter.WriteGuid(buffer, 0x28, ParentUniqueID);
             BigEndianWriter.WriteUInt32(buffer, 0x38, ParentTimeStamp);
             BigEndianWriter.WriteUInt32(buffer, 0x3C, Reserved);
-            ByteWriter.WriteUTF16String(buffer, 0x40, ParentUnicodeName, 256);
+            ByteWriter.WriteUTF16BEString(buffer, 0x40, ParentUnicodeName, 256);
             ParentLocatorEntry1.WriteBytes(buffer, 0x240);
             ParentLocatorEntry2.WriteBytes(buffer, 0x258);
             ParentLocatorEntry3.WriteBytes(buffer, 0x270);
