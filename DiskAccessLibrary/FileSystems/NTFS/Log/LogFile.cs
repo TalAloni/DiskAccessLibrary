@@ -1,4 +1,4 @@
-/* Copyright (C) 2018-2019 Tal Aloni <tal.aloni.il@gmail.com>. All rights reserved.
+/* Copyright (C) 2018-2025 Tal Aloni <tal.aloni.il@gmail.com>. All rights reserved.
  * 
  * You can redistribute this program and/or modify it under the terms of
  * the GNU Lesser Public License as published by the Free Software Foundation,
@@ -32,9 +32,20 @@ namespace DiskAccessLibrary.FileSystems.NTFS
 
             // Unlike earlier Windows versions, Windows Vista and later will not write the tail pages
             // into their physical LSN-calculated location in the main circular area upon clean dismount.
-            // Note: If the volume was dismounted cleanly in LFS version 1.1, the two tail pages will typically be identical.
             ulong firstTailPageOffset = m_restartPage.SystemPageSize * 2;
-            m_tailPage = ReadPage(firstTailPageOffset);
+            ulong secondTailPageOffset = m_restartPage.SystemPageSize * 2 + m_restartPage.LogPageSize;
+            LfsRecordPage firstTailPage = ReadPage(firstTailPageOffset);
+            LfsRecordPage secondTailPage = ReadPage(secondTailPageOffset);
+            if (secondTailPage.LastEndLsn > firstTailPage.LastEndLsn)
+            {
+                m_tailPage = secondTailPage;
+                m_isFirstTailPageTurn = true;
+            }
+            else
+            {
+                m_tailPage = firstTailPage;
+            }
+
             m_tailPageOffsetInFile = m_tailPage.LastLsnOrFileOffset;
             m_isTailCopyDirty = true; // Ensure that this page will be written to the circular area before the tail pages are overwritten
         }
