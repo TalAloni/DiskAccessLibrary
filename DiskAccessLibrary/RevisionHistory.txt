@@ -309,3 +309,12 @@ Revision History:
         VMDK: Added ability to create a stream-optimized VMDK.
         VMDK: Monolithic-sparse: Bugfix: Do not set offset in sparse extent description.
         VMDK: Do not allocate grains to write zeros in monolithic-sparse VMDK.
+
+1.6.5 - VMDK: Monolithic-sparse: Reduce IO operations when allocating multiple grains in a single write.
+        VMDK: Monolithic-sparse: Bugfix: Unnecessary file access was attempted on read-only disk.
+        VMDK: Stream-optimized: ZLibCompressionHelper: Support additional valid header values.
+        MBRPartition: Added PartitionType property.
+        GPTPartition: Bugfix: Set partition name when instantiated using DiskExtent constructor.
+        VHD: VHDFooter: Fix checksum calculation being limited to sector size.
+        VHD: Fix Differencing VHD parent name encoding.
+        NTFS: LogFile: Support writing to volumes created by Windows Vista and later.
