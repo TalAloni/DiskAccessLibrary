@@ -318,3 +318,5 @@ Revision History:
         VHD: VHDFooter: Fix checksum calculation being limited to sector size.
         VHD: Fix Differencing VHD parent name encoding.
         NTFS: LogFile: Support writing to volumes created by Windows Vista and later.
+
+1.6.6 - NTFS: LogFile: Improved support writing to volumes created by Windows Vista and later.
