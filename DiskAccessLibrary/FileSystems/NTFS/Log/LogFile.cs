@@ -29,6 +29,14 @@ namespace DiskAccessLibrary.FileSystems.NTFS
             {
                 throw new NotSupportedException("The volume was not dismounted cleanly, the Windows NTFS driver must be used to bring the volume back to a consistent state");
             }
+
+            // Unlike earlier Windows versions, Windows Vista and later will not write the tail pages
+            // into their physical LSN-calculated location in the main circular area upon clean dismount.
+            // Note: If the volume was dismounted cleanly in LFS version 1.1, the two tail pages will typically be identical.
+            ulong firstTailPageOffset = m_restartPage.SystemPageSize * 2;
+            m_tailPage = ReadPage(firstTailPageOffset);
+            m_tailPageOffsetInFile = m_tailPage.LastLsnOrFileOffset;
+            m_isTailCopyDirty = true; // Ensure that this page will be written to the circular area before the tail pages are overwritten
         }
 
         private LfsRestartPage ReadRestartPage()
